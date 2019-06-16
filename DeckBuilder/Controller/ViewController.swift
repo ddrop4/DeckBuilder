@@ -7,24 +7,24 @@
 //
 
 import UIKit
+import Foundation
 
 class ViewController: UIViewController {
     
     @IBOutlet weak var collectionView: UICollectionView!
-
+    
+    let url = URL(string: "https://api.hearthstonejson.com/v1/25770/ruRU/cards.json")!
     var itemMenuArray: [Menu] = {
         var cardMenu = Menu()
-        cardMenu.name = "Leeroy"
-        cardMenu.imageName = "Leeroy"
+        cardMenu.name = ""
         
         var cardMenu2 = Menu()
-        cardMenu2.name = "Dr. Boom"
-        cardMenu2.imageName = "doctorboom"
+
         return [cardMenu, cardMenu2]
     }()
     
     // MARK: - UI
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.dataSource = self
@@ -40,7 +40,29 @@ class ViewController: UIViewController {
             }
         }
     }
-}
+    
+    func getJSON() {
+        guard let url = URL(string: "https://api.hearthstonejson.com/v1/25770/ruRU/cards.json") else { return }
+        URLSession.shared.dataTask(with: url) { (data, response, error) in
+            guard let data = data else { return }
+            do {
+                let cards = try JSONDecoder().decode(Menu.self, from: data)
+                DispatchQueue.main.sync() {
+                    
+                }
+                print(cards)
+            } catch {
+                print("Error:", error)
+            }
+//            do {
+//                let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers)
+//                print(json)
+//            } catch let jsonError {
+//                print("Something went wrong, error:", jsonError)
+//            }
+            }.resume()
+        }
+    }
 
 extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

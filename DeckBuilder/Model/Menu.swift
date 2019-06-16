@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Menu {
+struct Menu: Decodable {
     var name: String?
-    var imageName: String?
+    var id: String?
 }
