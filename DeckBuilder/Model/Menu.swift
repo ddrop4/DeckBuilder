@@ -11,4 +11,6 @@ import Foundation
 struct Menu: Decodable {
     var name: String?
     var id: String?
+    var text: String?
+    var rarity: String?
 }
