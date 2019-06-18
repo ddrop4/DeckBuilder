@@ -15,31 +15,39 @@ class DetailViewController: UIViewController {
         var id: String
     }
     
-    let id = "ART_BOT_Bundle_001.png"
+    struct CardId: Decodable {
+        var id: String
+    }
     
     @IBOutlet weak var detailCardImage: UIImageView!
     @IBOutlet weak var detailCardLabel: UILabel!
     
-    func getJSON() {
+    var ids = [CardId]() {
+        didSet {
+            guard let first = ids.first else {
+                return
+            }
+            guard let url = URL(string: "https://art.hearthstonejson.com/v1/render/latest/ruRU/512x/\(first.id).png") else { return }
+            downloadImage(from: url)
+            
+        }
+    }
+    var cards = [CardsDetail]()
+    
+    func getId() {
         guard let url = URL(string: "https://api.hearthstonejson.com/v1/25770/ruRU/cards.json") else { return }
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard let data = data else { return }
             do {
-                let cards = try JSONDecoder().decode([CardsDetail].self, from: data)
+                let id = try JSONDecoder().decode([CardId].self, from: data)
                 DispatchQueue.main.async {
-                    self.detailCardLabel.text = CardsDetail.name
+                    self.ids = id
+                    print(self.ids)
                 }
-                print(cards)
             } catch {
-                print("Error:", error)
+                print(error)
             }
-            //            do {
-            //                let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers)
-            //                print(json)
-            //            } catch let jsonError {
-            //                print("Something went wrong, error:", jsonError)
-            //            }
-            }.resume()
+        }.resume()
     }
     
     func getData(from url: URL, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
@@ -58,12 +66,8 @@ class DetailViewController: UIViewController {
         }
     }
     
-    var menu: Menu?
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        let url = URL(string: "https://art.hearthstonejson.com/v1/render/latest/ruRU/512x/\(id)")!
-        downloadImage(from: url)
-        getJSON()
+        getId()
     }
 }
